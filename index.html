@@ -1,0 +1,679 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d2340">
+<title>EduControl | Plataforma académica</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap');
+:root{--navy:#102743;--blue:#1769aa;--cyan:#24bfd0;--bg:#f3f7fc;--surface:#fff;--text:#203247;--muted:#7c8da2;--line:#e7edf4;--shadow:0 12px 35px #183b5b0d;--sidebar:264px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh}
+.sidebar{position:fixed;inset:0 auto 0 0;width:var(--sidebar);background:linear-gradient(180deg,#102743,#0b1c32);color:#fff;padding:26px 18px;z-index:30;display:flex;flex-direction:column;transition:transform .35s ease}
+.brand{display:flex;align-items:center;gap:12px;padding:0 10px 30px}
+.brand-mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),#397ce3);display:grid;place-items:center;font-size:22px;box-shadow:0 8px 22px #24bfd044}
+.brand-name{font:800 21px Manrope,sans-serif;letter-spacing:-.7px}
+.brand-name span{color:#4bd5df}
+.school{margin:0 10px 22px;padding:12px;border:1px solid #ffffff18;border-radius:13px;background:#ffffff09}
+.school small{display:block;color:#9eb3ca;font-size:10px;text-transform:uppercase;letter-spacing:1.3px;margin-bottom:5px}
+.school strong{font-size:12px}
+.nav-label{font-size:10px;color:#7890aa;text-transform:uppercase;letter-spacing:1.5px;padding:0 12px 10px}
+.nav{display:grid;gap:6px}
+.nav button{border:0;background:transparent;color:#aebed0;text-align:left;padding:13px 14px;border-radius:12px;display:flex;align-items:center;gap:13px;font-weight:600;transition:.25s}
+.nav button .ico{width:22px;text-align:center;font-size:17px}
+.nav button:hover{background:#ffffff12;color:#fff;transform:translateX(3px)}
+.nav button.active{background:linear-gradient(100deg,#1769aa,#248cb9);color:#fff;box-shadow:0 8px 20px #1769aa44}
+.sidebar-bottom{margin-top:auto;padding:14px 10px 0;color:#8197af;font-size:11px;line-height:1.6}
+.main{margin-left:var(--sidebar);min-height:100vh}
+.topbar{height:78px;background:#ffffffdf;backdrop-filter:blur(14px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px;position:sticky;top:0;z-index:20}
+.top-left{display:flex;align-items:center;gap:14px}
+.topbar h2{font:800 18px Manrope;color:var(--navy)}
+.topbar p{font-size:12px;color:var(--muted);margin-top:3px}
+.top-actions{display:flex;align-items:center;gap:10px}
+.icon-btn{width:40px;height:40px;border:1px solid var(--line);border-radius:12px;background:white;color:var(--navy);font-size:17px;transition:.2s}
+.icon-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.profile{display:flex;align-items:center;gap:9px;margin-left:8px}
+.avatar{width:37px;height:37px;border-radius:50%;display:grid;place-items:center;background:#dff5fa;color:#147ca2;font-weight:800}
+.profile strong{display:block;font-size:12px}
+.profile small{color:var(--muted);font-size:10px}
+.menu-toggle{display:none}
+.content{max-width:1500px;margin:auto;padding:30px 34px 45px}
+.page{display:none;animation:pageIn .45s ease both}
+.page.active{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+.hero{position:relative;overflow:hidden;border-radius:24px;padding:38px 42px;color:white;background:linear-gradient(115deg,#102743 0%,#1769aa 58%,#24bfd0 100%);box-shadow:0 18px 40px #1769aa25;margin-bottom:25px;min-height:225px}
+.hero:before,.hero:after{content:"";position:absolute;border:1px solid #ffffff24;border-radius:50%;pointer-events:none}
+.hero:before{width:340px;height:340px;right:-45px;top:-160px;box-shadow:0 0 0 28px #ffffff08,0 0 0 58px #ffffff06}
+.hero:after{width:220px;height:220px;right:100px;bottom:-175px;box-shadow:0 0 0 25px #ffffff08}
+.hero-content{position:relative;z-index:1;max-width:640px}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#b8f4f5;font-weight:800;margin-bottom:13px}
+.hero h1{font:800 clamp(27px,4vw,42px) Manrope;line-height:1.15;letter-spacing:-1.5px;margin-bottom:12px}
+.hero p{color:#e0f0fa;line-height:1.7;max-width:560px;font-size:14px;margin-bottom:20px}
+.btn{border:0;border-radius:11px;padding:12px 17px;background:linear-gradient(100deg,#1769aa,#24bfd0);color:white;font-weight:800;box-shadow:0 7px 16px #1769aa25;transition:.25s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 12px 22px #1769aa35}
+.btn.light{background:white;color:#1769aa;box-shadow:none}
+.btn.secondary{background:#eaf5fb;color:#1769aa;box-shadow:none}
+.btn.danger{background:#fff0f1;color:#d74c5e;box-shadow:none}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:22px}
+.stat,.panel,.subject,.about-card{background:var(--surface);border:1px solid #edf1f6;border-radius:17px;box-shadow:var(--shadow)}
+.stat{padding:20px;position:relative;overflow:hidden;transition:.28s}
+.stat:hover,.subject:hover,.about-card:hover{transform:translateY(-5px);box-shadow:0 17px 35px #183b5b13}
+.stat:after{content:"";position:absolute;width:75px;height:75px;border-radius:50%;right:-25px;top:-25px;background:#dff5fa}
+.stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;font-weight:700}
+.stat-icon{width:37px;height:37px;border-radius:12px;background:#e9f7fb;display:grid;place-items:center;font-size:18px;position:relative;z-index:1}
+.stat-number{font:800 29px Manrope;color:var(--navy);margin-top:13px;letter-spacing:-1px}
+.stat-note{font-size:10px;color:#16a1a9;margin-top:4px}
+.dashboard-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}
+.panel{padding:22px;margin-bottom:18px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.panel h3,.section-title{font:800 17px Manrope;color:var(--navy)}
+.panel-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+.quick{border:1px solid #e6f0f7;background:#f5faff;border-radius:13px;padding:17px;text-align:left;color:var(--blue);font-weight:800;transition:.25s}
+.quick:hover{background:#e7f6fb;transform:translateY(-3px);border-color:#bde8ef}
+.quick span{display:block;font-size:23px;margin-bottom:9px}
+.quick small{display:block;color:var(--muted);font-weight:500;margin-top:4px;font-size:10px}
+.activity-list{display:grid;gap:13px}
+.activity-item{display:flex;gap:11px;align-items:flex-start;font-size:12px;color:var(--text)}
+.activity-dot{width:9px;height:9px;border-radius:50%;background:var(--cyan);margin-top:4px;box-shadow:0 0 0 4px #e5f8fa;flex:none}
+.activity-item small{display:block;color:var(--muted);margin-top:4px}
+.progress-wrap{margin-top:14px}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:7px;color:var(--muted)}
+.progress{height:8px;background:#edf2f7;border-radius:20px;overflow:hidden}
+.progress span{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#1769aa,#24bfd0);transition:width .8s ease}
+.section-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:20px}
+.section-heading h1{font:800 26px Manrope;color:var(--navy);letter-spacing:-.8px}
+.section-heading p{font-size:12px;color:var(--muted);margin-top:5px}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.field{border:1px solid #dfe8f0;background:#fff;border-radius:10px;padding:11px 13px;outline:none;color:var(--text);min-width:0}
+.field:focus{border-color:#24bfd0;box-shadow:0 0 0 3px #24bfd01b}
+.toolbar .field.search{flex:1;min-width:200px}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:13px}
+table{width:100%;border-collapse:collapse;min-width:680px;background:white}
+th,td{padding:14px 15px;text-align:left;border-bottom:1px solid #edf1f5;font-size:12px}
+th{background:#f4f9fc;color:#53718d;text-transform:uppercase;font-size:10px;letter-spacing:.6px}
+tbody tr{transition:background .2s}
+tbody tr:hover{background:#f8fbfe}
+tbody tr:last-child td{border-bottom:0}
+.student-name{font-weight:800;color:var(--navy)}
+.muted{color:var(--muted)}
+.actions{white-space:nowrap}
+.small-btn{border:0;border-radius:8px;padding:7px 9px;margin-right:3px;font-size:11px;font-weight:800}
+.edit{background:#eaf5ff;color:#1769aa}
+.remove{background:#fff0f1;color:#d34d60}
+.pill{display:inline-flex;padding:5px 9px;border-radius:30px;font-size:10px;font-weight:800;background:#e9f8f1;color:#19845b}
+.pill.late{background:#fff5e5;color:#b87819}
+.pill.absent{background:#fff0f1;color:#ce4b5d}
+.subject-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.subject{padding:22px;transition:.25s;position:relative;overflow:hidden}
+.subject-icon{width:45px;height:45px;border-radius:14px;background:#eaf7fb;display:grid;place-items:center;font-size:22px;margin-bottom:16px}
+.subject h3{font:800 15px Manrope;color:var(--navy);margin-bottom:7px}
+.subject p{font-size:11px;color:var(--muted);line-height:1.6}
+.subject strong{display:block;color:var(--blue);font-size:11px;margin-top:15px}
+.about-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.about-card{padding:23px;line-height:1.7;transition:.25s}
+.about-card h3{font:800 15px Manrope;color:var(--blue);margin-bottom:9px}
+.about-card p,.about-card li{font-size:12px;color:#61758a}
+.about-card ul{padding-left:18px}
+.about-card.full{grid-column:1/-1}
+.modal{display:none;position:fixed;inset:0;background:#07182dcc;backdrop-filter:blur(5px);z-index:60;justify-content:center;align-items:center;padding:18px}
+.modal.show{display:flex;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal-content{background:#fff;border-radius:20px;padding:25px;width:100%;max-width:540px;max-height:92vh;overflow:auto;box-shadow:0 25px 70px #06182c55;animation:pop .25s ease}
+@keyframes pop{from{transform:translateY(15px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-head h2{font:800 20px Manrope;color:var(--navy)}
+.modal-close{border:0;background:#f1f5f8;width:33px;height:33px;border-radius:10px;font-size:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-group label{display:block;font-size:10px;font-weight:800;color:#63798e;margin:7px 0 5px}
+.form-group.full{grid-column:1/-1}
+.form-group .field{width:100%}
+.modal-buttons{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.empty{text-align:center;padding:28px;color:var(--muted)}
+.empty b{display:block;color:var(--navy);margin-bottom:5px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:#102743;color:#fff;padding:13px 19px;border-radius:12px;font-size:12px;z-index:100;opacity:0;pointer-events:none;transition:.3s;box-shadow:0 10px 25px #10274333}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.footer{text-align:center;color:#9aa9b8;font-size:10px;padding:28px 0 5px}
+body.dark{--bg:#101c2b;--surface:#17283b;--text:#dce7f2;--muted:#91a4b8;--line:#2a3c50;--shadow:0 12px 35px #00000020}
+body.dark .topbar{background:#17283beF;border-color:#2a3c50}
+body.dark .topbar h2,body.dark .section-heading h1,body.dark .panel h3,body.dark .stat-number,body.dark .subject h3,body.dark .about-card h3{color:#eaf5ff}
+body.dark .stat,body.dark .panel,body.dark .subject,body.dark .about-card,body.dark .modal-content,body.dark table{background:var(--surface);border-color:#2a3c50}
+body.dark th{background:#20354a;color:#b8ccdf}
+body.dark td{border-color:#2a3c50}
+body.dark .field{background:#17283b;border-color:#354b62;color:#eaf5ff}
+body.dark .quick{background:#20354a;border-color:#304960;color:#8bdce7}
+body.dark .quick small{color:#9fb3c8}
+body.dark .modal-head h2{color:#eaf5ff}
+@media(max-width:1050px){:root{--sidebar:235px}.stats{grid-template-columns:repeat(2,1fr)}.subject-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.sidebar{transform:translateX(-100%);width:270px}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.menu-toggle{display:inline-grid;place-items:center}.topbar{padding:0 17px}.content{padding:22px 17px}.topbar h2{font-size:15px}.profile div:last-child{display:none}.dashboard-grid{grid-template-columns:1fr}.hero{padding:29px 25px}.section-heading{align-items:flex-start;flex-direction:column}}
+@media(max-width:540px){.stats{gap:9px}.stat{padding:14px}.stat-number{font-size:24px}.stat-top{font-size:10px}.subject-grid,.about-grid{grid-template-columns:1fr}.about-card.full{grid-column:auto}.quick-grid{gap:8px}.quick{padding:13px}.form-grid{grid-template-columns:1fr}.form-group.full{grid-column:auto}.toolbar .btn{width:100%}.hero h1{font-size:29px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+
+
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="brand-mark">✦</div><div class="brand-name">Edu<span>Control</span></div></div>
+  <div class="school"><small>Institución educativa</small><strong>Instituto Nacional San Luis</strong></div>
+  <div class="nav-label">Menú principal</div>
+  <nav class="nav">
+    <button class="active" data-page="inicio"><span class="ico">⌂</span> Panel principal</button>
+    <button data-page="estudiantes"><span class="ico">♙</span> Estudiantes</button>
+    <button data-page="materias"><span class="ico">▤</span> Materias</button>
+    <button data-page="notas"><span class="ico">▥</span> Calificaciones</button>
+    <button data-page="asistencia"><span class="ico">✓</span> Asistencia</button>
+    <button data-page="nosotros"><span class="ico">✧</span> Nosotros</button>
+  </nav>
+  <div class="sidebar-bottom">EduControl · Gestión académica<br>Versión 2.0 · 2026</div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div class="top-left">
+    <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
+    <div><h2 id="topTitle">Panel principal</h2><p id="todayText">Bienvenido a EduControl</p></div>
+  </div>
+  <div class="top-actions">
+    <button class="icon-btn" id="themeToggle" title="Cambiar tema">☾</button>
+    <button class="icon-btn" id="backupBtn" title="Exportar respaldo">⇩</button>
+    <div class="profile"><div class="avatar">EC</div><div><strong>Administrador</strong><small>Panel de control</small></div></div>
+  </div>
+</header>
+
+<div class="content">
+<section class="page active" id="inicio">
+  <div class="hero"><div class="hero-content">
+    <div class="eyebrow">Plataforma de gestión académica</div>
+    <h1>La educación, mejor organizada.</h1>
+    <p>Administra expedientes, materias, calificaciones y asistencia desde un solo espacio. Una herramienta práctica para mantener toda la información académica en orden.</p>
+    <button class="btn light" onclick="go('estudiantes')">Administrar estudiantes&nbsp; →</button>
+  </div></div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-top"><span>Estudiantes registrados</span><span class="stat-icon">🎓</span></div><div class="stat-number" id="totalStudents">0</div><div class="stat-note">Registros en el sistema</div></div>
+    <div class="stat"><div class="stat-top"><span>Materias disponibles</span><span class="stat-icon">📚</span></div><div class="stat-number">6</div><div class="stat-note">Áreas académicas</div></div>
+    <div class="stat"><div class="stat-top"><span>Calificaciones</span><span class="stat-icon">📊</span></div><div class="stat-number" id="totalGrades">0</div><div class="stat-note">Notas registradas</div></div>
+    <div class="stat"><div class="stat-top"><span>Asistencias</span><span class="stat-icon">🗓️</span></div><div class="stat-number" id="totalAttendance">0</div><div class="stat-note">Registros de asistencia</div></div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="panel">
+      <div class="panel-head"><div><h3>Accesos rápidos</h3><div class="panel-sub">Las herramientas que más utilizas</div></div></div>
+      <div class="quick-grid">
+        <button class="quick" onclick="openStudent()"><span>👤</span>Nuevo estudiante<small>Crear expediente académico</small></button>
+        <button class="quick" onclick="go('materias')"><span>📚</span>Ver materias<small>Consultar áreas y docentes</small></button>
+        <button class="quick" onclick="openGrade()"><span>📝</span>Agregar calificación<small>Registrar una nueva nota</small></button>
+        <button class="quick" onclick="openAttendance()"><span>✅</span>Registrar asistencia<small>Actualizar control diario</small></button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div><h3>Resumen académico</h3><div class="panel-sub">Indicadores generales</div></div></div>
+      <div class="progress-wrap"><div class="progress-label"><span>Asistencia registrada</span><b id="attendancePercent">0%</b></div><div class="progress"><span id="attendanceBar" style="width:0%"></span></div></div>
+      <div class="progress-wrap"><div class="progress-label"><span>Promedio general</span><b id="dashboardAverage">—</b></div><div class="progress"><span id="averageBar" style="width:0%"></span></div></div>
+      <div class="progress-wrap"><div class="progress-label"><span>Estudiantes en el sistema</span><b id="studentCountLabel">0</b></div><div class="progress"><span id="studentBar" style="width:0%"></span></div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div><h3>Actividad reciente</h3><div class="panel-sub">Últimos movimientos realizados</div></div></div>
+    <div class="activity-list" id="activityList"><div class="activity-item"><span class="activity-dot"></span><div>Bienvenido a EduControl.<small>El sistema está listo para utilizarse.</small></div></div></div>
+  </div>
+</section>
+
+<section class="page" id="estudiantes">
+  <div class="section-heading">
+    <div><h1>Estudiantes</h1><p>Administra los expedientes y datos de cada estudiante.</p></div>
+    <button class="btn" onclick="openStudent()">＋ Nuevo estudiante</button>
+  </div>
+  <div class="panel">
+    <div class="toolbar">
+      <input class="field search" id="searchStudent" placeholder="⌕  Buscar por nombre, grado, sección o contacto..." oninput="renderStudents()">
+      <select class="field" id="gradeFilter" onchange="renderStudents()"><option value="">Todos los grados</option></select>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Estudiante</th><th>Grado</th><th>Sección</th><th>Teléfono</th><th>Correo</th><th>Acciones</th></tr></thead>
+      <tbody id="studentTable"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="page" id="materias">
+  <div class="section-heading"><div><h1>Materias y docentes</h1><p>Consulta las áreas académicas disponibles.</p></div></div>
+  <div class="subject-grid">
+    <article class="subject"><div class="subject-icon">➗</div><h3>Matemática</h3><p>Desarrollo del razonamiento lógico, resolución de problemas y pensamiento numérico.</p><strong>Docente: Lorenzo</strong></article>
+    <article class="subject"><div class="subject-icon">📖</div><h3>Lenguaje</h3><p>Comunicación oral y escrita, comprensión lectora y expresión de ideas.</p><strong>Docente: Martina</strong></article>
+    <article class="subject"><div class="subject-icon">🔬</div><h3>Ciencia</h3><p>Exploración del entorno natural, investigación y conocimiento científico.</p><strong>Docente: Ana</strong></article>
+    <article class="subject"><div class="subject-icon">🌎</div><h3>Sociales</h3><p>Historia, geografía, ciudadanía y comprensión de la sociedad.</p><strong>Docente: David</strong></article>
+    <article class="subject"><div class="subject-icon">💻</div><h3>Desarrollo corporal</h3><p>Actividad física, coordinación, bienestar y hábitos saludables.</p><strong>Docente: Luis</strong></article>
+    <article class="subject"><div class="subject-icon">🧩</div><h3>Módulo</h3><p>Aprendizaje práctico y desarrollo de competencias técnicas.</p><strong>Docente: Liduvina</strong></article>
+  </div>
+</section>
+
+<section class="page" id="notas">
+  <div class="section-heading">
+    <div><h1>Calificaciones</h1><p>Registra y consulta el rendimiento académico.</p></div>
+    <button class="btn" onclick="openGrade()">＋ Agregar calificación</button>
+  </div>
+  <div class="stats" style="grid-template-columns:repeat(2,1fr)">
+    <div class="stat"><div class="stat-top"><span>Promedio general</span><span class="stat-icon">📈</span></div><div class="stat-number" id="average">—</div><div class="stat-note">Escala de 0 a 10</div></div>
+    <div class="stat"><div class="stat-top"><span>Notas registradas</span><span class="stat-icon">📝</span></div><div class="stat-number" id="gradeCount">0</div><div class="stat-note">Total de evaluaciones</div></div>
+  </div>
+  <div class="panel">
+    <div class="toolbar"><input class="field search" id="searchGrade" placeholder="⌕  Buscar estudiante o materia..." oninput="renderGrades()"></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Estudiante</th><th>Materia</th><th>Nota</th><th>Fecha</th><th>Acción</th></tr></thead>
+      <tbody id="gradeTable"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="page" id="asistencia">
+  <div class="section-heading">
+    <div><h1>Control de asistencia</h1><p>Registra la presencia y puntualidad de los estudiantes.</p></div>
+    <button class="btn" onclick="openAttendance()">＋ Registrar asistencia</button>
+  </div>
+  <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat"><div class="stat-top"><span>Presentes</span><span class="stat-icon">🟢</span></div><div class="stat-number" id="presentCount">0</div></div>
+    <div class="stat"><div class="stat-top"><span>Ausentes</span><span class="stat-icon">🔴</span></div><div class="stat-number" id="absentCount">0</div></div>
+    <div class="stat"><div class="stat-top"><span>Tardanzas</span><span class="stat-icon">🟠</span></div><div class="stat-number" id="lateCount">0</div></div>
+  </div>
+  <div class="panel">
+    <div class="toolbar">
+      <input class="field search" id="searchAttendance" placeholder="⌕  Buscar estudiante..." oninput="renderAttendance()">
+      <input class="field" type="date" id="attendanceFilter" onchange="renderAttendance()">
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Estudiante</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr></thead>
+      <tbody id="attendanceTable"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="page" id="nosotros">
+  <div class="section-heading"><div><h1>Acerca de EduControl</h1><p>Conoce el propósito y los principios del sistema.</p></div></div>
+  <div class="about-grid">
+    <div class="about-card full"><h3>¿Qué es EduControl?</h3><p>EduControl es una aplicación web diseñada para gestionar expedientes estudiantiles. Permite organizar la información de estudiantes, materias, docentes, calificaciones y asistencia desde un solo lugar.</p></div>
+    <div class="about-card"><h3>Misión</h3><p>Ofrecer una herramienta tecnológica que facilite la administración de la información estudiantil, ayudando a las instituciones educativas a trabajar de manera organizada, eficiente y segura.</p></div>
+    <div class="about-card"><h3>Visión</h3><p>Ser una plataforma reconocida en El Salvador por contribuir a la modernización de los procesos educativos mediante soluciones digitales accesibles, confiables e innovadoras.</p></div>
+    <div class="about-card"><h3>Objetivo general</h3><p>Desarrollar una aplicación web que permita gestionar y organizar digitalmente los expedientes estudiantiles, facilitando el acceso a la información académica y administrativa.</p></div>
+    <div class="about-card"><h3>Valores</h3><ul><li>Responsabilidad</li><li>Honestidad</li><li>Respeto</li><li>Innovación</li><li>Compromiso</li><li>Confidencialidad</li></ul></div>
+    <div class="about-card"><h3>Principios</h3><ul><li>Seguridad de la información.</li><li>Organización.</li><li>Facilidad de uso.</li><li>Accesibilidad.</li><li>Calidad.</li><li>Mejora continua.</li></ul></div>
+    <div class="about-card"><h3>Políticas</h3><ul><li>Proteger la información.</li><li>Respetar la privacidad.</li><li>Usar la plataforma responsablemente.</li><li>Realizar mantenimiento.</li><li>Crear copias de seguridad.</li></ul></div>
+  </div>
+</section>
+
+<div class="footer">EduControl · Instituto Nacional San Luis · 2026</div>
+</div>
+</main>
+</div>
+
+<!-- Modal estudiante -->
+<div class="modal" id="studentModal"><div class="modal-content">
+  <div class="modal-head"><h2 id="studentTitle">Nuevo estudiante</h2><button class="modal-close" onclick="closeModal('studentModal')">×</button></div>
+  <form id="studentForm"><input type="hidden" id="studentId"><div class="form-grid">
+    <div class="form-group full"><label>Nombre completo *</label><input class="field" id="studentName" required="" placeholder="Nombre y apellidos"></div>
+    <div class="form-group"><label>Grado *</label><input class="field" id="studentGrade" required="" placeholder="Ej. Primer año"></div>
+    <div class="form-group"><label>Sección</label><input class="field" id="studentSection" placeholder="Ej. B"></div>
+    <div class="form-group"><label>Teléfono de contacto</label><input class="field" id="studentContact" placeholder="0000-0000"></div>
+    <div class="form-group"><label>Correo electrónico</label><input class="field" id="studentEmail" type="email" placeholder="correo@ejemplo.com"></div>
+    <div class="form-group"><label>Fecha de nacimiento</label><input class="field" id="studentBirth" type="date"></div>
+    <div class="form-group"><label>Responsable</label><input class="field" id="studentGuardian" placeholder="Nombre del encargado"></div>
+  </div>
+  <div class="modal-buttons"><button type="button" class="btn secondary" onclick="closeModal('studentModal')">Cancelar</button><button type="submit" class="btn">Guardar estudiante</button></div>
+  </form>
+</div></div>
+
+<!-- Modal calificación -->
+<div class="modal" id="gradeModal"><div class="modal-content">
+  <div class="modal-head"><h2>Agregar calificación</h2><button class="modal-close" onclick="closeModal('gradeModal')">×</button></div>
+  <form id="gradeForm"><div class="form-grid">
+    <div class="form-group full"><label>Estudiante *</label><select class="field" id="gradeStudent" required=""></select></div>
+    <div class="form-group"><label>Materia *</label><select class="field" id="gradeSubject" required=""><option value="">Seleccionar materia</option><option>Matemática</option><option>Lenguaje</option><option>Ciencia</option><option>Sociales</option><option>Desarrollo corporal</option><option>Módulo</option></select></div>
+    <div class="form-group"><label>Nota (0 a 10) *</label><input class="field" type="number" id="gradeValue" min="0" max="10" step=".1" required="" placeholder="8.5"></div>
+    <div class="form-group full"><label>Fecha *</label><input class="field" type="date" id="gradeDate" required=""></div>
+  </div>
+  <div class="modal-buttons"><button type="button" class="btn secondary" onclick="closeModal('gradeModal')">Cancelar</button><button class="btn" type="submit">Guardar nota</button></div>
+  </form>
+</div></div>
+
+<!-- Modal asistencia -->
+<div class="modal" id="attendanceModal"><div class="modal-content">
+  <div class="modal-head"><h2>Registrar asistencia</h2><button class="modal-close" onclick="closeModal('attendanceModal')">×</button></div>
+  <form id="attendanceForm"><div class="form-grid">
+    <div class="form-group full"><label>Estudiante *</label><select class="field" id="attendanceStudent" required=""></select></div>
+    <div class="form-group"><label>Fecha *</label><input class="field" type="date" id="attendanceDate" required=""></div>
+    <div class="form-group"><label>Estado *</label><select class="field" id="attendanceStatus"><option>Presente</option><option>Ausente</option><option>Tarde</option></select></div>
+  </div>
+  <div class="modal-buttons"><button type="button" class="btn secondary" onclick="closeModal('attendanceModal')">Cancelar</button><button class="btn" type="submit">Guardar asistencia</button></div>
+  </form>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const load = key => {try{return JSON.parse(localStorage.getItem(key)||"[]")}catch(e){return []}};
+let students=load("students"), grades=load("grades"), attendance=load("attendance"), activities=[];
+const today=new Date().toISOString().slice(0,10);
+
+$("todayText").textContent=new Date().toLocaleDateString("es-SV",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+
+function go(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  $(page).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  $("topTitle").textContent=({inicio:"Panel principal",estudiantes:"Estudiantes",materias:"Materias",notas:"Calificaciones",asistencia:"Asistencia",nosotros:"Nosotros"})[page];
+  $("sidebar").classList.remove("open");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
+$("menuToggle").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
+
+$("themeToggle").addEventListener("click",()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("eduTheme",document.body.classList.contains("dark")?"dark":"light");
+  $("themeToggle").textContent=document.body.classList.contains("dark")?"☀":"☾";
+});
+
+if(localStorage.getItem("eduTheme")==="dark"){
+  document.body.classList.add("dark");
+  $("themeToggle").textContent="☀";
+}
+
+function save(){
+  localStorage.setItem("students",JSON.stringify(students));
+  localStorage.setItem("grades",JSON.stringify(grades));
+  localStorage.setItem("attendance",JSON.stringify(attendance));
+  updateDashboard();
+}
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function toast(msg){
+  let t=$("toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer=setTimeout(()=>t.classList.remove("show"),2600);
+}
+
+function log(msg){
+  activities.unshift({msg,time:new Date().toLocaleTimeString("es-SV",{hour:"2-digit",minute:"2-digit"})});
+  activities=activities.slice(0,5);
+  $("activityList").innerHTML=activities.map(a=>`<div class="activity-item"><span class="activity-dot"></span><div>${esc(a.msg)}<small>Hoy · ${a.time}</small></div></div>`).join("");
+}
+
+function updateDashboard(){
+  $("totalStudents").textContent=students.length;
+  $("totalGrades").textContent=grades.length;
+  $("totalAttendance").textContent=attendance.length;
+  $("gradeCount").textContent=grades.length;
+
+  const avg=grades.length?grades.reduce((s,g)=>s+Number(g.value||0),0)/grades.length:0;
+
+  $("average").textContent=grades.length?avg.toFixed(2):"—";
+  $("dashboardAverage").textContent=grades.length?avg.toFixed(2)+"/10":"—";
+  $("averageBar").style.width=Math.max(0,Math.min(100,avg*10))+"%";
+
+  $("attendancePercent").textContent=attendance.length?Math.round(attendance.filter(a=>a.status==="Presente").length/attendance.length*100)+"%":"0%";
+  $("attendanceBar").style.width=$("attendancePercent").textContent;
+  $("studentCountLabel").textContent=students.length;
+  $("studentBar").style.width=Math.min(100,students.length*5)+"%";
+
+  $("presentCount").textContent=attendance.filter(a=>a.status==="Presente").length;
+  $("absentCount").textContent=attendance.filter(a=>a.status==="Ausente").length;
+  $("lateCount").textContent=attendance.filter(a=>a.status==="Tarde").length;
+}
+
+function closeModal(id){$(id).classList.remove("show")}
+function openModal(id){$(id).classList.add("show")}
+
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{
+  if(e.target===m)m.classList.remove("show");
+}));
+
+function fillStudents(id){
+  $(id).innerHTML='<option value="">Seleccionar estudiante</option>'+students.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
+}
+
+function openStudent(id=""){
+  $("studentForm").reset();
+  $("studentId").value=id;
+  $("studentTitle").textContent=id?"Editar estudiante":"Nuevo estudiante";
+
+  if(id){
+    const s=students.find(x=>x.id===id);
+    if(!s)return;
+    for(const [field,key] of [["studentName","name"],["studentGrade","grade"],["studentSection","section"],["studentContact","contact"],["studentEmail","email"],["studentBirth","birth"],["studentGuardian","guardian"]]){
+      $(field).value=s[key]||"";
+    }
+  }
+  openModal("studentModal");
+}
+
+$("studentForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const id=$("studentId").value;
+  const s={
+    id:id||crypto.randomUUID(),
+    name:$("studentName").value.trim(),
+    grade:$("studentGrade").value.trim(),
+    section:$("studentSection").value.trim(),
+    contact:$("studentContact").value.trim(),
+    email:$("studentEmail").value.trim(),
+    birth:$("studentBirth").value,
+    guardian:$("studentGuardian").value.trim()
+  };
+
+  if(id){
+    students=students.map(x=>x.id===id?s:x);
+    log("Se actualizó el expediente de "+s.name);
+  }else{
+    students.push(s);
+    log("Se registró a "+s.name);
+  }
+
+  save();
+  renderStudents();
+  closeModal("studentModal");
+  toast("Expediente guardado correctamente.");
+});
+
+function renderStudents(){
+  const q=($("searchStudent").value||"").toLowerCase();
+  const filter=$("gradeFilter").value;
+  const gradesList=[...new Set(students.map(s=>s.grade).filter(Boolean))];
+
+  $("gradeFilter").innerHTML='<option value="">Todos los grados</option>'+gradesList.map(g=>`<option ${g===filter?"selected":""}>${esc(g)}</option>`).join("");
+
+  const list=students.filter(s=>
+    ([s.name,s.grade,s.section,s.contact,s.email].join(" ").toLowerCase().includes(q))&&
+    (!filter||s.grade===filter)
+  );
+
+  $("studentTable").innerHTML=list.length?list.map(s=>`
+    <tr>
+      <td><span class="student-name">${esc(s.name)}</span></td>
+      <td>${esc(s.grade)}</td>
+      <td>${esc(s.section||"—")}</td>
+      <td>${esc(s.contact||"—")}</td>
+      <td>${esc(s.email||"—")}</td>
+      <td class="actions">
+        <button class="small-btn edit" onclick="openStudent('${esc(s.id)}')">Editar</button>
+        <button class="small-btn remove" onclick="deleteStudent('${esc(s.id)}')">Borrar</button>
+      </td>
+    </tr>`).join():
+    '<tr><td colspan="6"><div class="empty"><b>No hay estudiantes para mostrar</b>Agrega un expediente o cambia la búsqueda.</div></td></tr>';
+}
+
+function deleteStudent(id){
+  const s=students.find(x=>x.id===id);
+  if(!s||!confirm("¿Deseas eliminar el expediente de "+s.name+"? También se eliminarán sus notas y asistencias."))return;
+  students=students.filter(x=>x.id!==id);
+  grades=grades.filter(x=>x.studentId!==id);
+  attendance=attendance.filter(x=>x.studentId!==id);
+  save();
+  renderStudents();
+  renderGrades();
+  renderAttendance();
+  log("Se eliminó un expediente.");
+  toast("Estudiante eliminado.");
+}
+
+function openGrade(){
+  if(!students.length){
+    toast("Primero registra un estudiante.");
+    go("estudiantes");
+    return;
+  }
+  fillStudents("gradeStudent");
+  $("gradeForm").reset();
+  $("gradeDate").value=today;
+  openModal("gradeModal");
+}
+
+$("gradeForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  grades.push({
+    id:crypto.randomUUID(),
+    studentId:$("gradeStudent").value,
+    subject:$("gradeSubject").value,
+    value:Number($("gradeValue").value),
+    date:$("gradeDate").value
+  });
+  save();
+  renderGrades();
+  closeModal("gradeModal");
+  log("Se agregó una calificación.");
+  toast("Calificación guardada.");
+});
+
+function renderGrades(){
+  const q=($("searchGrade").value||"").toLowerCase();
+  const rows=grades.filter(g=>{
+    const s=students.find(x=>x.id===g.studentId);
+    return s&&(`${s.name} ${g.subject}`.toLowerCase().includes(q));
+  });
+
+  $("gradeTable").innerHTML=rows.length?rows.map(g=>{
+    const s=students.find(x=>x.id===g.studentId);
+    return `<tr>
+      <td class="student-name">${esc(s.name)}</td>
+      <td>${esc(g.subject)}</td>
+      <td><b>${Number(g.value).toFixed(1)}</b> / 10</td>
+      <td>${esc(g.date)}</td>
+      <td><button class="small-btn remove" onclick="deleteGrade('${esc(g.id)}')">Borrar</button></td>
+    </tr>`;
+  }).join():
+  '<tr><td colspan="5"><div class="empty"><b>No hay calificaciones registradas</b>Agrega una nota para comenzar.</div></td></tr>';
+
+  updateDashboard();
+}
+
+function deleteGrade(id){
+  if(!confirm("¿Eliminar esta calificación?"))return;
+  grades=grades.filter(g=>g.id!==id);
+  save();
+  renderGrades();
+  log("Se eliminó una calificación.");
+  toast("Calificación eliminada.");
+}
+
+function openAttendance(){
+  if(!students.length){
+    toast("Primero registra un estudiante.");
+    go("estudiantes");
+    return;
+  }
+  fillStudents("attendanceStudent");
+  $("attendanceForm").reset();
+  $("attendanceDate").value=today;
+  openModal("attendanceModal");
+}
+
+$("attendanceForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const studentId=$("attendanceStudent").value;
+  const date=$("attendanceDate").value;
+
+  if(attendance.some(a=>a.studentId===studentId&&a.date===date)){
+    toast("Ya existe una asistencia para ese estudiante en esa fecha.");
+    return;
+  }
+
+  attendance.push({
+    id:crypto.randomUUID(),
+    studentId,
+    date,
+    status:$("attendanceStatus").value
+  });
+
+  save();
+  renderAttendance();
+  closeModal("attendanceModal");
+  log("Se registró una asistencia.");
+  toast("Asistencia guardada.");
+});
+
+function renderAttendance(){
+  const q=($("searchAttendance").value||"").toLowerCase();
+  const date=$("attendanceFilter").value;
+
+  const rows=attendance.filter(a=>{
+    const s=students.find(x=>x.id===a.studentId);
+    return s&&s.name.toLowerCase().includes(q)&&(!date||a.date===date);
+  });
+
+  $("attendanceTable").innerHTML=rows.length?rows.map(a=>{
+    const s=students.find(x=>x.id===a.studentId);
+    const cl=a.status==="Presente"?"":a.status==="Tarde"?"late":"absent";
+    return `<tr>
+      <td class="student-name">${esc(s.name)}</td>
+      <td>${esc(a.date)}</td>
+      <td><span class="pill ${cl}">${esc(a.status)}</span></td>
+      <td><button class="small-btn remove" onclick="deleteAttendance('${esc(a.id)}')">Borrar</button></td>
+    </tr>`;
+  }).join():
+  '<tr><td colspan="4"><div class="empty"><b>No hay asistencias para mostrar</b>Registra la asistencia de tus estudiantes.</div></td></tr>';
+
+  updateDashboard();
+}
+
+function deleteAttendance(id){
+  if(!confirm("¿Eliminar este registro de asistencia?"))return;
+  attendance=attendance.filter(a=>a.id!==id);
+  save();
+  renderAttendance();
+  log("Se eliminó un registro de asistencia.");
+  toast("Registro eliminado.");
+}
+
+$("backupBtn").addEventListener("click",()=>{
+  const data={
+    system:"EduControl",
+    version:"2.0",
+    exportedAt:new Date().toISOString(),
+    students,
+    grades,
+    attendance
+  };
+
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="respaldo-educontrol.json";
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("Respaldo descargado.");
+});
+
+renderStudents();
+renderGrades();
+renderAttendance();
+updateDashboard();
+</script>
